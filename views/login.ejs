@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/loginstyle.css">
+</head>
+<body>
+    <div class="login-container">
+        <form class="login" method="post">
+            <h1>Login</h1>
+            <input type="text" name="email" id="email" placeholder="Enter your Email" required>
+            <input type="password" name="password" id="password" placeholder="Enter your Password" required></input>
+            <button class="button" type="submit">Login</button>
+            <div>or</div>
+            <button class="button" onClick="redirectToSignupPage()">Signup</button>
+        </form>
+    </div>
+
+    <script>
+        function redirectToSignupPage(){
+            window.location.href = '/register';
+        }
+    </script>
+
+</body>
+</html>
+
+
+

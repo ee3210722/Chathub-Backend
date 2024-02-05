@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="css/registerstyle.css">
+</head>
+<body>
+    <div class="signup-container">
+        <form class="signup" method="post" enctype="multipart/form-data">
+            <h1>Signup</h1>
+            <input type="text" name="name" id="name" placeholder="Enter your Name" required>
+            <input type="text" name="email" id="email" placeholder="Enter your Email" required>
+            <input type="password" name="password" id="password" placeholder="Enter your Password" minLength="5" required>
+            <input type="file" name="image" id="image" placeholder="Upload your image" required>
+            <button class="button" type="submit">Signup</button>
+            <div>or</div>
+            <button class="button" onClick="redirectToLoginPage()">Login</button>
+        </form>
+    </div>
+
+    <script>
+        function redirectToLoginPage(){
+            window.location.href = '/';
+        }
+    </script>
+    
+</body>
+</html>
