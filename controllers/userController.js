@@ -5,12 +5,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const register = async (req, res) => {
     try {
-        const passwordHash = await bcrypt.hash(req.body.password, 10);
+        const { name, email, password, confirmPassword } = req.body;
+        if (password !== confirmPassword) res.json({ success: false, msg: "Confirm your password again!" });
+
+        const passwordHash = await bcrypt.hash(password, 10);
 
         const user = new USER({
-            name: req.body.name,
-            email: req.body.email,
-            image: req.file.buffer,
+            name,
+            email,
             password: passwordHash
         })
 
@@ -29,7 +31,6 @@ const login = async (req, res) => {
         if (userData) {
             const isSame = await bcrypt.compare(password, userData.password);
             if (isSame) {
-                // req.session.user = userData;
                 const payload = {userData: userData}
                 const authToken = jwt.sign(payload, JWT_SECRET);
                 res.json({success: true, authToken: authToken});
@@ -46,7 +47,6 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        // req.session.destroy();
         res.json({success: true , msg: "Logged Out successfully!"});
     } catch (error) {
         res.json({success: false , msg: error});
