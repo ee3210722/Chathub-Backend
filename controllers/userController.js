@@ -1,26 +1,25 @@
 const USER = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
+// const sharp = require('sharp');
+const JWT_SECRET_TOKEN = process.env.JWT_SECRET_TOKEN;
 
 const register = async (req, res) => {
     try {
         const { name, email, password, confirmPassword } = req.body;
-        if (password !== confirmPassword) res.json({ success: false, msg: "Confirm your password again!" });
-
+        if (password !== confirmPassword) res.status(400).send({ success: false, msg: "Confirm your password again!" });
         const passwordHash = await bcrypt.hash(password, 10);
-
         const user = new USER({
             name,
             email,
             password: passwordHash
         })
-
         await user.save();
-        res.status(200).json({success: true});
+        res.status(200).send({success: true, msg:"Account is created successfully !"});
 
     } catch (error) {
-        res.status(500).json({success: false,  message: "Internal server error" });
+        console.log(error);
+        res.status(500).send({success: false,  message: "Internal server error" });
     }
 }
 
@@ -31,25 +30,61 @@ const login = async (req, res) => {
         if (userData) {
             const isSame = await bcrypt.compare(password, userData.password);
             if (isSame) {
-                const payload = {userData: userData}
-                const authToken = jwt.sign(payload, JWT_SECRET);
-                res.json({success: true, authToken: authToken});
+                const payload = { userData: userData }
+                const authToken = jwt.sign(payload, JWT_SECRET_TOKEN);
+                res.status(200).send({success: true, authToken: authToken, msg: "Logged in succesfully!"});
             } else {
-                res.json({ success: false , msg: "Incorrect password" });
+                res.status(400).send({ success: false , msg: "Incorrect password" });
             }
         } else {
-            res.json({success: false, msg: "This email is not registered"})
+            res.status(400).send({ success: false, msg: "This email is not registered" });
         }
     } catch (error) {
-        res.status(500).json({ success: false, msg: "Internal server error" });
+        console.log(error);
+        res.status(500).send({ success: false, msg: "Internal server error" });
     }
 }
 
+const editUserProfile = async (req, res) => {
+    try {
+        const { name, dateOfBirth, age, occupation, bio } = req.body;
+        const userData = req.userData;
+
+        const updatedUserFields = {
+            name: name === "" ? userData.name : name,
+            date_of_birth: dateOfBirth === "" ? userData.date_of_birth : dateOfBirth,
+            age: age === "" ? userData.age : age,
+            occupation: occupation === "" ? userData.occupation : occupation,
+            bio: bio === "" ? userData.bio : bio
+        };
+
+        // If an image is present in the request, add it to the updatedUserFields
+        if (req.file) {
+            updatedUserFields.image = req.file.buffer;
+        }
+
+        const updatedUser = await USER.findByIdAndUpdate(
+            userData._id,
+            {
+                $set: updatedUserFields
+            },
+            { new: true }
+        );
+
+        res.status(200).send({ success: true, msg: "User profile updated successfully" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ success: false, msg: "Internal server error" });
+    }
+};
+
+
 const logout = async (req, res) => {
     try {
-        res.json({success: true , msg: "Logged Out successfully!"});
+        res.status(200).send({success: true , msg: "Logged Out successfully!"});
     } catch (error) {
-        res.json({success: false , msg: error});
+        res.status(500).send({success: false , msg: error});
     }
 }
 
@@ -57,33 +92,7 @@ const logout = async (req, res) => {
 module.exports = {
     register,
     login,
+    editUserProfile,
     logout,
 }
 
-// const loadRegister = async (req, res) => {
-//     try {
-//         res.render('register', {res});
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// }
-
-// const loadLogin = async (req, res) => {
-//     try {
-//         res.render('login');
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// }
-
-// const loadDashboard = async (req, res) => {
-//     try {
-//         let users = await USER.find({_id: {$nin:[req.session.user._id]}})
-//         // res.render('dashboard', {user: req.session.user, users:users});
-//         res.redirect('http://localhost:3000/');
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }

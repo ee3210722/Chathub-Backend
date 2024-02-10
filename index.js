@@ -12,17 +12,7 @@ const server = http.createServer(app);
 const port = process.env.PORT || 9000;
 
 const cors = require('cors');
-const allowedOrigins = ['http://localhost:3000']; // Add your frontend URLs
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
+app.use(cors());
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());

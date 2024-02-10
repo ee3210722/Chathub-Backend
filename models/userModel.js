@@ -10,10 +10,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    image: {
-        type: Buffer,
-        required: true
-    },
     password: {
         type: String,
         required: true
@@ -26,6 +22,10 @@ const userSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         default: []
     },
+    image: {
+        type: Buffer,
+        default: null
+    },
     date_of_birth: {
         type: Date,
         default: null
@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema({
     occupation: {
         type: String,
         default: null
-
     },
     bio: {
         type: String,
