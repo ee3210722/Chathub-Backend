@@ -10,12 +10,12 @@ const register = async (req, res) => {
         const user = new USER({
             name: req.body.name,
             email: req.body.email,
-            image: 'images/' + req.file.filename,
+            image: req.file.buffer,
             password: passwordHash
         })
 
         await user.save();
-        res.json({success: true});
+        res.status(200).json({success: true});
 
     } catch (error) {
         res.status(500).json({success: false,  message: "Internal server error" });

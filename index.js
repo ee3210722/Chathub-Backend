@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const http = require("http");
+require('dotenv').config();
 
 mongoose.connect(process.env.MONGODB_URL)
   .then(() => console.log("ChathubDB on MongoDb Alas has been connected"))
@@ -25,17 +26,7 @@ app.use('/', userRoutes);
 server.listen(port, () => console.log(`Server is listening at PORT:${port}`));
 
 
-// require('dotenv').config();
-// const session = require('express-session');
-// app.use(session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: true,
-//     saveUninitialized: true
-// }));
 
-// const path = require('path');
-// app.set('view engine', 'ejs');
-// app.set('views', path.resolve("./views"));
-// app.use(express.static(path.resolve("./public")));
-// app.use(express.static(path.join(__dirname, 'public')));
+
+
 

@@ -7,19 +7,45 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     image: {
-        type: String,
+        type: Buffer,
         required: true
     },
     password: {
         type: String,
         required: true
     },
-    is_online: {
+    friends: {
+        type: [mongoose.Schema.Types.ObjectId],
+        default: []
+    },
+    rooms_joined: {
+        type: [mongoose.Schema.Types.ObjectId],
+        default: []
+    },
+    date_of_birth: {
+        type: Date,
+        default: null
+    },
+    occupation: {
         type: String,
-        default: '0'
+        default: null
+
+    },
+    bio: {
+        type: String,
+        default: null
+    },
+    age: {
+        type: Number,
+        default: null
+    },
+    is_online: {
+        type: Boolean,
+        default: false
     }
 },
 {timestamps:true}
