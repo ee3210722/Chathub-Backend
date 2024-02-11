@@ -19,7 +19,6 @@ const register = async (req, res) => {
         res.status(200).json({success: true, msg:"Account is created successfully !"});
 
     } catch (error) {
-        console.log(error);
         res.status(500).json({success: false,  message: "Internal server error" });
     }
 }
@@ -41,7 +40,6 @@ const login = async (req, res) => {
             res.status(400).json({ success: false, msg: "This email is not registered" });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 }
@@ -75,7 +73,6 @@ const editUserProfile = async (req, res) => {
         res.status(200).json({ success: true, msg: "User profile updated successfully" });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
