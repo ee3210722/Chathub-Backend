@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 // const sharp = require('sharp');
 const JWT_SECRET_TOKEN = process.env.JWT_SECRET_TOKEN;
 
+
 const register = async (req, res) => {
     try {
         const { name, email, password, confirmPassword } = req.body;
@@ -30,7 +31,7 @@ const login = async (req, res) => {
         if (userData) {
             const isSame = await bcrypt.compare(password, userData.password);
             if (isSame) {
-                const payload = { userData: userData }
+                const payload = { userId: userData._id }
                 const authToken = jwt.sign(payload, JWT_SECRET_TOKEN);
                 res.status(200).json({success: true, authToken: authToken, msg: "Logged in succesfully!"});
             } else {
@@ -48,7 +49,7 @@ const login = async (req, res) => {
 const editUserProfile = async (req, res) => {
     try {
         const { name, dateOfBirth, age, occupation, bio } = req.body;
-        const userData = req.userData;
+        const userData = await USER.findById(req.userId);
 
         const updatedUserFields = {
             name: name === "" ? userData.name : name,
@@ -80,6 +81,17 @@ const editUserProfile = async (req, res) => {
 };
 
 
+const getUserData = async (req, res) => {
+    try {
+        const userData = await USER.findById(req.userId);
+        res.status(200).json({ success: true, userData: userData , msg: "User profile data is fetched successfully" });
+
+    } catch (error) {
+        res.status(500).json({ success: false, msg: "Internal server error" });
+    }
+};
+
+
 const logout = async (req, res) => {
     try {
         res.status(200).json({success: true , msg: "Logged Out successfully!"});
@@ -93,6 +105,7 @@ module.exports = {
     register,
     login,
     editUserProfile,
+    getUserData,
     logout,
 }
 

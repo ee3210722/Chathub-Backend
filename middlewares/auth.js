@@ -6,7 +6,7 @@ const verifyAuth = (req, res, next) => {
     if (!token) res.status(401).json({success: false, msg: "AuthToken is Required" });
     try {
         const payload = jwt.verify(token, JWT_SECRET);
-        req.userData = payload.userData;
+        req.userId = payload.userId;
         next();
     } catch(error) {
         res.status(401).json({success: false, msg: "Please authenticate using a valid token" });
