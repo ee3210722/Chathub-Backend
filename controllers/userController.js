@@ -7,7 +7,7 @@ const JWT_SECRET_TOKEN = process.env.JWT_SECRET_TOKEN;
 const register = async (req, res) => {
     try {
         const { name, email, password, confirmPassword } = req.body;
-        if (password !== confirmPassword) res.status(400).send({ success: false, msg: "Confirm your password again!" });
+        if (password !== confirmPassword) res.status(400).json({ success: false, msg: "Confirm your password again!" });
         const passwordHash = await bcrypt.hash(password, 10);
         const user = new USER({
             name,
@@ -15,11 +15,11 @@ const register = async (req, res) => {
             password: passwordHash
         })
         await user.save();
-        res.status(200).send({success: true, msg:"Account is created successfully !"});
+        res.status(200).json({success: true, msg:"Account is created successfully !"});
 
     } catch (error) {
         console.log(error);
-        res.status(500).send({success: false,  message: "Internal server error" });
+        res.status(500).json({success: false,  message: "Internal server error" });
     }
 }
 
@@ -32,16 +32,16 @@ const login = async (req, res) => {
             if (isSame) {
                 const payload = { userData: userData }
                 const authToken = jwt.sign(payload, JWT_SECRET_TOKEN);
-                res.status(200).send({success: true, authToken: authToken, msg: "Logged in succesfully!"});
+                res.status(200).json({success: true, authToken: authToken, msg: "Logged in succesfully!"});
             } else {
-                res.status(400).send({ success: false , msg: "Incorrect password" });
+                res.status(400).json({ success: false , msg: "Incorrect password" });
             }
         } else {
-            res.status(400).send({ success: false, msg: "This email is not registered" });
+            res.status(400).json({ success: false, msg: "This email is not registered" });
         }
     } catch (error) {
         console.log(error);
-        res.status(500).send({ success: false, msg: "Internal server error" });
+        res.status(500).json({ success: false, msg: "Internal server error" });
     }
 }
 
@@ -71,20 +71,20 @@ const editUserProfile = async (req, res) => {
             { new: true }
         );
 
-        res.status(200).send({ success: true, msg: "User profile updated successfully" });
+        res.status(200).json({ success: true, msg: "User profile updated successfully" });
 
     } catch (error) {
         console.error(error);
-        res.status(500).send({ success: false, msg: "Internal server error" });
+        res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };
 
 
 const logout = async (req, res) => {
     try {
-        res.status(200).send({success: true , msg: "Logged Out successfully!"});
+        res.status(200).json({success: true , msg: "Logged Out successfully!"});
     } catch (error) {
-        res.status(500).send({success: false , msg: error});
+        res.status(500).json({success: false , msg: error});
     }
 }
 
