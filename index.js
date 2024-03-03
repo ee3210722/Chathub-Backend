@@ -19,8 +19,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //  Route handlers
-const userRoutes = require('./routes/userRoute');
-app.use('/', userRoutes);
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/user', userRoutes);
+
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/api/chat', chatRoutes);
 
 
 server.listen(port, () => console.log(`Server is listening at PORT:${port}`));

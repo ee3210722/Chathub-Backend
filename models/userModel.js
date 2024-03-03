@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -50,6 +51,18 @@ const userSchema = new mongoose.Schema({
 {timestamps:true}
 )
 
-const USER = mongoose.model('User', userSchema);
+// The userSchema.pre("save") middleware will be triggered before saving the user data into the database.
+userSchema.pre("save", async function (next) {
+    if (!this.isModified()) {
+        next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
 
+userSchema.methods.matchPassword = async function (enteredPasssword) {
+    return await bcrypt.compare(enteredPasssword, this.password);
+}
+
+const USER = mongoose.model('User', userSchema);
 module.exports = USER;
