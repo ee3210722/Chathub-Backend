@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
         default: []
     },
     image: {
-        type: Buffer,
-        default: null
+        type: String,
+        default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
     },
     date_of_birth: {
         type: Date,

@@ -2,7 +2,7 @@ const USER = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const generateToken = require('../config/generateToken');
-
+const cloudinary = require("../config/cloudinaryConfig");
 
 
 const register = async (req, res) => {
@@ -21,7 +21,6 @@ const register = async (req, res) => {
         res.status(200).json({success: true, msg:"Account is created successfully !"});
 
     } catch (error) {
-        console.log(error);
         res.status(500).json({success: false,  message: "Internal server error" });
     }
 }
@@ -30,11 +29,12 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const userData = await USER.findOne({ email });
+
         if (userData) {
             const isSame = await userData.matchPassword(password);
             if (isSame) {
                 const authToken = generateToken(userData._id);
-                res.status(200).json({success: true, authToken: authToken, msg: "Logged in succesfully!"});
+                res.status(200).json({success: true, authToken: authToken, userInfo: userData, msg: "Logged in succesfully!"});
             } else {
                 res.status(400).json({ success: false , msg: "Incorrect password" });
             }
@@ -42,7 +42,6 @@ const login = async (req, res) => {
             res.status(400).json({ success: false, msg: "This email is not registered" });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 }
@@ -54,8 +53,6 @@ const logout = async (req, res) => {
         res.status(500).json({success: false , msg: error});
     }
 }
-
-
 
 const getUserData = async (req, res) => {
     try {
@@ -69,22 +66,15 @@ const getUserData = async (req, res) => {
 
 const editUserProfile = async (req, res) => {
     try {
-        const { name, dateOfBirth, age, occupation, bio } = req.body;
+        const { name, dateOfBirth, age, occupation, bio} = req.body;
         const userData = await USER.findById(req.userId);
-
-        const updatedUserFields = {
-            name: name === "" ? userData.name : name,
-            date_of_birth: dateOfBirth === "" ? userData.date_of_birth : dateOfBirth,
-            age: age === "" ? userData.age : age,
-            occupation: occupation === "" ? userData.occupation : occupation,
-            bio: bio === "" ? userData.bio : bio
+         const updatedUserFields = {
+            name: name===''? userData.name : name,
+            date_of_birth: dateOfBirth===''? userData.date_of_birth : dateOfBirth,
+            age: age===''? userData.age : age,
+            occupation: occupation===''? userData.occupation : occupation,
+            bio: bio === '' ? userData.bio : bio,
         };
-
-        // If an image is present in the request, add it to the updatedUserFields
-        if (req.file) {
-            updatedUserFields.image = req.file.buffer;
-        }
-
         const updatedUser = await USER.findByIdAndUpdate(
             userData._id,
             {
@@ -92,13 +82,25 @@ const editUserProfile = async (req, res) => {
             },
             { new: true }
         );
+        res.status(200).json({ success: true, updatedUser: updatedUser, msg: "User profile updated successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, msg: "Internal server error" });
+    }
+}
 
-        res.status(200).json({ success: true, msg: "User profile updated successfully" });
+const uploadUserImage = async (req, res) => {
+    try {
+        const userData = await USER.findById(req.userId);
+        const file = req.files.image;
+        const result = await cloudinary.uploader.upload(file.tempFilePath);
+        userData.image = result.url;
+        await userData.save();
+        res.status(200).json({ success: true, updatedUser: userData, msg: "User profile photo updated successfully" });
 
     } catch (error) {
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
-};
+}
 
 const fetchAllUsers = async (req, res) => {
     const keyword = req.query.search
@@ -111,15 +113,15 @@ const fetchAllUsers = async (req, res) => {
         : {};
 
     const users = await USER.find(keyword).find({ _id: { $ne: req.userId } });
-    res.send(users);
+    res.json(users);
 }
-
 
 
 module.exports = {
     register,
     login,
     editUserProfile,
+    uploadUserImage,
     getUserData,
     logout,
     fetchAllUsers,
