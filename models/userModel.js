@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         default: []
     },
-    rooms_joined: {
+    groupsJoined: {
         type: [mongoose.Schema.Types.ObjectId],
         default: []
     },
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
     },
-    date_of_birth: {
+    dateOfBirth: {
         type: Date,
         default: null
     },
@@ -43,22 +43,13 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: null
     },
-    is_online: {
+    isOnline: {
         type: Boolean,
         default: false
     }
-},
-{timestamps:true}
+}, {
+    timestamps: true}
 )
-
-// The userSchema.pre("save") middleware will be triggered before saving the user data into the database.
-userSchema.pre("save", async function (next) {
-    if (!this.isModified()) {
-        next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-});
 
 userSchema.methods.matchPassword = async function (enteredPasssword) {
     return await bcrypt.compare(enteredPasssword, this.password);

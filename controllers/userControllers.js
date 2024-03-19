@@ -12,15 +12,19 @@ const register = async (req, res) => {
         const userExist = await USER.findOne( { email });
         if (userExist) res.json({ success: false, msg: "User already Exists" })
 
+        const salt = await bcrypt.genSalt(10);
+        const newPassword = await bcrypt.hash(password, salt);
+
         const user = new USER({
             name: name,
             email: email,
-            password: password
+            password: newPassword
         })
         await user.save();
         res.status(200).json({success: true, msg:"Account is created successfully !"});
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({success: false,  message: "Internal server error" });
     }
 }
@@ -70,7 +74,7 @@ const editUserProfile = async (req, res) => {
         const userData = await USER.findById(req.userId);
          const updatedUserFields = {
             name: name===''? userData.name : name,
-            date_of_birth: dateOfBirth===''? userData.date_of_birth : dateOfBirth,
+            dateOfBirth: dateOfBirth===''? userData.dateOfBirth : dateOfBirth,
             age: age===''? userData.age : age,
             occupation: occupation===''? userData.occupation : occupation,
             bio: bio === '' ? userData.bio : bio,
@@ -84,6 +88,7 @@ const editUserProfile = async (req, res) => {
         );
         res.status(200).json({ success: true, updatedUser: updatedUser, msg: "User profile updated successfully" });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 }
@@ -102,7 +107,7 @@ const uploadUserImage = async (req, res) => {
     }
 }
 
-const fetchAllUsers = async (req, res) => {
+const searchForUsers = async (req, res) => {
     const keyword = req.query.search
         ? {
             $or: [
@@ -116,6 +121,18 @@ const fetchAllUsers = async (req, res) => {
     res.json(users);
 }
 
+const fetchAllUsers = async (req, res) => {
+    try {
+        const user = await USER.findById(req.userId);
+        const userFriends = user.friends;
+        const excludedIds = [...userFriends, req.userId];
+        const allUsers = await USER.find({ _id: { $nin: excludedIds } });
+        res.status(200).json(allUsers);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ success: false, msg: "Internal Server Error" });
+    }
+}
 
 module.exports = {
     register,
@@ -124,6 +141,7 @@ module.exports = {
     uploadUserImage,
     getUserData,
     logout,
-    fetchAllUsers,
+    searchForUsers,
+    fetchAllUsers
 }
 

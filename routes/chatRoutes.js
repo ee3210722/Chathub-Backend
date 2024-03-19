@@ -12,5 +12,7 @@ router.route("/removeFromGroup").put(authMiddleware.verifyAuth, chatControllers.
 router.route("/addToGroup").put(authMiddleware.verifyAuth, chatControllers.addToGroup);
 router.route("/fetchAllGroups").get(authMiddleware.verifyAuth, chatControllers.fetchAllGroups);
 router.route("/groupExit").get(authMiddleware.verifyAuth, chatControllers.groupExit);
+router.route("/addSelfToGroup").put(authMiddleware.verifyAuth, chatControllers.addSelfToGroup);
+router.route("/deleteGroup").delete(authMiddleware.verifyAuth, chatControllers.deleteGroup);
 
 module.exports = router;
