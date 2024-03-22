@@ -2,7 +2,7 @@ const CHAT = require("../models/chatModel");
 const USER = require("../models/userModel");
 
 
-const accessChat = async (req, res) => {
+const accessChatOfUser = async (req, res) => {
     try {
         const { userId } = req.body;
         let isChat = await CHAT.find({
@@ -39,7 +39,22 @@ const accessChat = async (req, res) => {
     }
 };
 
-const fetchChats = async (req,res) => {
+const accessChatOfGroup = async (req, res) => {
+    try {
+        const { chatId } = req.body;
+        let targetedChat = await CHAT.findById(chatId);
+        if (targetedChat.users.includes(req.userId)) {
+            return res.status(200).send(targetedChat);
+        }
+        else {
+            res.status(300).json({msg: "Request Admin to join"});
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, msg: "Internal server error" });
+    }
+};
+
+const fetchUserChats = async (req,res) => {
     try {
         await CHAT.find({ users: { $elemMatch: { $eq: req.userId } } })
             .populate("users", "name email")
@@ -97,19 +112,18 @@ const createGroup = async (req, res) => {
     }
 }
 
-const fetchAllGroups = async (req,res) => {
+const fetchAllGroups = async (req, res) => {
     try {
-        const user = await USER.findById(req.userId);
-        const groupsJoined = user.groupsJoined;
-        const allGroups = await CHAT.find({ _id: { $nin: groupsJoined }, isGroupChat: true })
+        const allGroups = await CHAT.find({isGroupChat: true })
             .populate("groupAdmin", "name");
 
         return res.status(200).send(allGroups);
 
     } catch (error) {
-        res.status(500).json({ success: false, msg: "Internal server error" });
+        res.status(500).json({ success: false, msg: "Internal server error harshit" });
     }
-}
+};
+
 
 const deleteGroup = async (req, res) => {
     try {
@@ -239,8 +253,9 @@ const addSelfToGroup = async (req, res) => {
 
 
 module.exports = {
-    accessChat,
-    fetchChats,
+    accessChatOfUser,
+    accessChatOfGroup,
+    fetchUserChats,
     createGroup,
     renameGroup,
     removeFromGroup,

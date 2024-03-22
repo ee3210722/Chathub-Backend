@@ -4,8 +4,9 @@ const router = express.Router();
 const chatControllers = require("../controllers/chatControllers");
 const authMiddleware = require("../middlewares/auth");
 
-router.route("/").post(authMiddleware.verifyAuth, chatControllers.accessChat);
-router.route("/").get(authMiddleware.verifyAuth, chatControllers.fetchChats);
+router.route("/accessUserChat").post(authMiddleware.verifyAuth, chatControllers.accessChatOfUser);
+router.route("/accessGroupChat").post(authMiddleware.verifyAuth, chatControllers.accessChatOfGroup);
+router.route("/fetchUserChats").get(authMiddleware.verifyAuth, chatControllers.fetchUserChats);
 router.route("/createGroup").post(authMiddleware.verifyAuth, chatControllers.createGroup);
 router.route("/renameGroup").put(authMiddleware.verifyAuth, chatControllers.renameGroup);
 router.route("/removeFromGroup").put(authMiddleware.verifyAuth, chatControllers.removeFromGroup);
