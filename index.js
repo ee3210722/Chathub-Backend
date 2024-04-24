@@ -5,13 +5,14 @@ const cors = require('cors');
 require('dotenv').config();
 
 mongoose.connect(process.env.MONGODB_URL)
-  .then(() => console.log("ChathubDB on MongoDb Alas has been connected"))
+  .then(() => console.log("ChathubDB on MongoDB Atlas has been connected"))
   .catch(error => console.error("MongoDB connection error:", error));
 
 const app = express();
 const port = process.env.PORT || 9000;
 
 app.use(fileUpload({useTempFiles: true}))
+
 app.use(cors());
 
 const bodyParser = require('body-parser');

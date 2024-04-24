@@ -18,9 +18,7 @@ const allMessages = async (req,res) => {
 }
 
 const sendMessage = async (req,res) => {
-    const { chatId, content } = req.body;
-    console.log("chatId: ", chatId);
-    console.log("content: ", content);
+    let { chatId, content } = req.body;
     if (!chatId || !content) {
         res.status(400).json({success:false, msg:"Invalid Data is passed into Request"})
     }
@@ -32,15 +30,13 @@ const sendMessage = async (req,res) => {
         })
         const onGoingChat = await CHAT.findByIdAndUpdate(chatId, { latestMessage: newMessage });
 
-        // Populate sender, chat, and receivers in the newMessage document
         newMessage = await MESSAGE.populate(newMessage, [
             { path: "sender", select: "name" },
             { path: "chat" },
             { path: "receivers" }
         ]);
-
-        // Populate users in the chat document
         const updatedChat = await CHAT.populate(onGoingChat, { path: "users", select: "name email" });
+        
         res.status(200).json({ success: true, sendedMessage: newMessage, onGoingChat: updatedChat, msg: "message send successfully" });
 
     } catch (error) {
